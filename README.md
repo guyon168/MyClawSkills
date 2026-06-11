@@ -1,6 +1,6 @@
 # MyClawSkills 🐾
 
-WorkBuddy 技能（Skills）合集 — 一键安装，开箱即用。
+AI Agent 技能（Skills）合集 — 独立的 Python 工具脚本，开箱即用。
 
 ## 📦 技能列表
 
@@ -50,38 +50,37 @@ python scripts/smart_fetcher.py https://example.com/article
 
 ---
 
-## 🚀 安装技能到 WorkBuddy
+## 🚀 快速上手
 
-### 方式一：克隆整个仓库（推荐）
+### 克隆仓库
 
 ```bash
 git clone https://github.com/guyon168/MyClawSkills.git
+cd MyClawSkills
 ```
 
-将对应的 skill 目录复制到 WorkBuddy 的 skills 目录：
+### 直接运行脚本
 
-```bash
-# 用户级安装（所有项目可用）
-cp -r binance-token-analysis ~/.workbuddy/skills/
-cp -r smart-web-fetch ~/.workbuddy/skills/
+每个技能都是独立的 Python 脚本，进入对应目录即可运行：
 
-# 或 项目级安装（仅当前项目可用）
-cp -r binance-token-analysis <你的项目>/.workbuddy/skills/
-cp -r smart-web-fetch <你的项目>/.workbuddy/skills/
+| 技能 | 运行命令 |
+|------|----------|
+| Binance Token Analysis | `cd binance-token-analysis && python scripts/analyze.py` |
+| Smart Web Fetch | `cd smart-web-fetch && python scripts/smart_fetcher.py <URL>` |
+
+### 作为 AI Agent 技能集成
+
+如果你在使用支持自定义 Skills 的 AI Agent 平台（如 Claude Code、Cline、Cursor 等），可将技能目录放入对应的 skills 目录下：
+
+```
+# 以 Claude Code 为例：
+cp -r binance-token-analysis ~/.claude/commands/
+cp -r smart-web-fetch ~/.claude/commands/
+
+# 其他平台请参照各自文档的 skills/commands 配置方式
 ```
 
-### 方式二：单独安装某个技能
-
-只需将对应文件夹（含 `SKILL.md`）放入 skills 目录即可：
-
-| 技能 | 目录 |
-|------|------|
-| Binance Token Analysis | `binance-token-analysis/` |
-| Smart Web Fetch | `smart-web-fetch/` |
-
-### 验证安装
-
-在 WorkBuddy 中输入 `/skills` 或查看技能列表，确认已加载。
+每个技能目录中的 `SKILL.md` 是技能描述文件，Agent 会根据它理解技能的用途和用法。
 
 ---
 
