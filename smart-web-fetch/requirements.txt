@@ -1,0 +1,9 @@
+# smart-web-fetch 技能依赖
+# 安装命令: pip install -r requirements.txt
+# ⚠️ 不需要 playwright / scrapling，也不需要下载浏览器！
+
+requests>=2.31.0
+
+# 可选: 如果需要更好的 markdown 处理
+# html2text>=2020.1.16
+# beautifulsoup4>=4.12.0
