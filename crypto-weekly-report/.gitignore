@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+
+# Runtime outputs
+logs/
+reports/
+*.log
+
+# Local secrets/config
+.env
+.env.*
+*.pem
+*.key
+*.token
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
