@@ -1,24 +1,20 @@
-# Crypto Weekly Report
+# Crypto Daily Report
 
 ## 用途
 
-这个 Skill 是公开脱敏版 AI 加密周报生成器。它复用已脱敏的公开行情、宏观数据、加密新闻与公开 X/Twitter 热点采集能力，生成偏「每周综合复盘」口径的 Markdown 市场报告、风险提示与多空策略参考。
+这个 Skill 提供一个脱敏后的 AI 加密日报生成器，可抓取公开行情、宏观数据、加密新闻与公开 X/Twitter 热点，生成 Markdown 格式的市场总览、风险提示与多空策略参考。
 
 适用于：
 
-- 生成 BTC / ETH / BNB 等主流币的每周综合报告素材
-- 聚合公开行情、公开新闻与公开社媒热点，形成周度市场观察
+- 生成 BTC / ETH / BNB 等主流币的日报素材
+- 聚合公开行情、公开新闻与公开社媒热点
 - 输出可保存到本地，也可按环境变量配置推送到企业微信或 Mattermost
 
 > 风险提示：报告仅供研究与信息整理，不构成投资建议。
 
-## 来源说明
-
-未在本机检索到独立的历史周报 Skill 项目。本目录基于已脱敏的 `crypto-daily-report` 能力创建周报版包装：代码继续使用公开数据源和同一套分析模块，入口、文档、环境变量和输出文案调整为周报口径。它不会伪造不存在的私有数据源或内部推送配置。
-
 ## 脱敏声明
 
-本目录是公开脱敏版本：
+本目录是从内部项目能力复制出的公开脱敏版本：
 
 - 不包含原项目 `.git`、日志、历史报告、缓存、WorkBuddy memory 或真实配置产物。
 - 不包含企业微信 Webhook、Mattermost Webhook、GitHub token、API key、私密 URL。
@@ -28,7 +24,7 @@
 ## 安装
 
 ```bash
-cd crypto-weekly-report
+cd crypto-daily-report
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -37,34 +33,34 @@ pip install -r requirements.txt
 ## 使用
 
 ```bash
-cd crypto-weekly-report/scripts
+cd crypto-daily-report/scripts
 python main.py --test      # 测试模式：生成并打印，不保存文件、不推送
-python main.py --print     # 生成周报，保存到 reports/ 并打印
-python main.py             # 生成周报并保存
+python main.py --print     # 生成报告，保存到 reports/ 并打印
+python main.py             # 生成报告并保存
 ```
 
 ## 环境变量配置
 
-默认无需任何密钥即可生成周报。可选环境变量如下：
+默认无需任何密钥即可生成报告。可选环境变量如下：
 
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
-| `CRYPTO_WEEKLY_USE_PROXY` | `false` | 是否启用本地代理 |
-| `CRYPTO_WEEKLY_PROXY_URL` | `http://127.0.0.1:7890` | 代理地址 |
-| `CRYPTO_WEEKLY_PUSH_ENABLED` | `false` | 是否启用推送 |
-| `CRYPTO_WEEKLY_PUSH_PROVIDER` | `mattermost` | `mattermost` 或 `wechat` |
+| `CRYPTO_DAILY_USE_PROXY` | `false` | 是否启用本地代理 |
+| `CRYPTO_DAILY_PROXY_URL` | `http://127.0.0.1:7890` | 代理地址 |
+| `CRYPTO_DAILY_PUSH_ENABLED` | `false` | 是否启用推送 |
+| `CRYPTO_DAILY_PUSH_PROVIDER` | `mattermost` | `mattermost` 或 `wechat` |
 | `MATTERMOST_WEBHOOK_URL` | 空 | Mattermost Incoming Webhook URL |
-| `MATTERMOST_USERNAME` | `Crypto Weekly Bot` | Mattermost 显示名称 |
+| `MATTERMOST_USERNAME` | `Crypto Daily Bot` | Mattermost 显示名称 |
 | `WECOM_WEBHOOK_URL` | 空 | 企业微信机器人 Webhook URL |
-| `CRYPTO_WEEKLY_REPORTS_DIR` | `scripts/reports` | 报告输出目录 |
-| `CRYPTO_WEEKLY_LOGS_DIR` | `scripts/logs` | 日志输出目录 |
-| `CRYPTO_WEEKLY_SR_ZONES_ENABLED` | `true` | 是否展示增强支撑/压力区间 |
+| `CRYPTO_DAILY_REPORTS_DIR` | `scripts/reports` | 报告输出目录 |
+| `CRYPTO_DAILY_LOGS_DIR` | `scripts/logs` | 日志输出目录 |
+| `CRYPTO_DAILY_SR_ZONES_ENABLED` | `true` | 是否展示增强支撑/压力区间 |
 
 示例：
 
 ```bash
-export CRYPTO_WEEKLY_PUSH_ENABLED=true
-export CRYPTO_WEEKLY_PUSH_PROVIDER=mattermost
+export CRYPTO_DAILY_PUSH_ENABLED=true
+export CRYPTO_DAILY_PUSH_PROVIDER=mattermost
 export MATTERMOST_WEBHOOK_URL="https://mattermost.example.invalid/incoming-webhook-placeholder"
 python scripts/main.py
 ```
@@ -72,7 +68,7 @@ python scripts/main.py
 ## 目录结构
 
 ```text
-crypto-weekly-report/
+crypto-daily-report/
 ├── SKILL.md
 ├── README.md
 ├── requirements.txt
@@ -104,7 +100,7 @@ crypto-weekly-report/
 
 ### 没有配置 Webhook 会失败吗？
 
-不会。脱敏版本默认 `CRYPTO_WEEKLY_PUSH_ENABLED=false`，未配置 Webhook 时不会推送。即使启用推送但未配置 URL，程序也只会记录警告并继续完成报告生成。
+不会。脱敏版本默认 `CRYPTO_DAILY_PUSH_ENABLED=false`，未配置 Webhook 时不会推送。即使启用推送但未配置 URL，程序也只会记录警告并继续完成报告生成。
 
 ### 是否会写入原项目？
 

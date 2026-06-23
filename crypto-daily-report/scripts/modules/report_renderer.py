@@ -1,6 +1,6 @@
 """
 报告渲染模块
-将所有数据组装成完整的「AI 加密周报」Markdown 文本
+将所有数据组装成完整的「AI 加密日报」Markdown 文本
 """
 from datetime import datetime, timezone, timedelta
 import logging
@@ -72,7 +72,7 @@ def _render_coin_section(data: dict) -> str:
     sup_str = _fmt_sr(supports[:2],    symbol) if supports    else "—"
 
     lines = [
-        f"{emoji} **{symbol}** {pr_str}｜近期 {chg_str}",
+        f"{emoji} **{symbol}** {pr_str}｜24h {chg_str}",
         f"阻力：{res_str}",
         f"支撑：{sup_str}",
     ]
@@ -230,7 +230,7 @@ def _render_risk_today(risk_analysis: dict) -> str:
     if not risks:
         return ""
 
-    lines = ["⚠️ **本周重点风险**"]
+    lines = ["⚠️ **今日独有风险**"]
     # 按严重程度排序
     severity_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
     sorted_risks = sorted(risks, key=lambda r: severity_order.get(r["severity"], 9))
@@ -254,17 +254,16 @@ def render_report(
     risk_analysis:  dict,
 ) -> str:
     """
-    组装完整周报 Markdown 文本
+    组装完整日报 Markdown 文本
     """
     now_cn = datetime.now(TZ_CN)
-    week_start = now_cn - timedelta(days=6)
-    date_str = f"{week_start.strftime('%Y-%m-%d')} 至 {now_cn.strftime('%Y-%m-%d')}"
+    date_str = now_cn.strftime("%Y-%m-%d")
     time_str = now_cn.strftime("%H:%M")
 
     sections = []
 
     # ─── 标题 ───
-    sections.append(f"**AI加密周报 · {date_str} {time_str} (UTC+8)**")
+    sections.append(f"**AI加密日报 · {date_str} {time_str} (UTC+8)**")
     sections.append("")
 
     # ─── 一、市场总览 ───
@@ -280,7 +279,7 @@ def render_report(
 
     # ─── 三、要闻速递 ───
     sections.append(DIVIDER)
-    sections.append("**三、要闻速递**（公开来源聚合）")
+    sections.append("**三、要闻速递**（24h内）")
     sections.append(DIVIDER)
     sections.append("")
     sections.append(_render_news_section(news))
@@ -297,7 +296,7 @@ def render_report(
         if data:
             sections.append(_render_strategy_coin(data))
 
-    # 本周重点风险
+    # 今日独有风险
     risk_text = _render_risk_today(risk_analysis)
     if risk_text:
         sections.append(risk_text)
@@ -313,7 +312,7 @@ def save_report(report_text: str, output_dir: str) -> str:
     import os
     os.makedirs(output_dir, exist_ok=True)
     now_cn = datetime.now(TZ_CN)
-    filename = now_cn.strftime("%G-W%V") + ".md"
+    filename = now_cn.strftime("%Y-%m-%d") + ".md"
     filepath = os.path.join(output_dir, filename)
 
     with open(filepath, "w", encoding="utf-8") as f:

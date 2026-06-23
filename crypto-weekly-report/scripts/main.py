@@ -1,7 +1,7 @@
 """
-AI 加密日报 - 主入口
+AI 加密周报 - 主入口
 用法:
-  python main.py           # 生成今日报告并输出到 reports/
+  python main.py           # 生成本周报告并输出到 reports/
   python main.py --print   # 同时打印到控制台
   python main.py --test    # 仅测试数据获取，不保存文件
 """
@@ -99,7 +99,7 @@ def run(print_report: bool = False, test_mode: bool = False):
     start_time = time.time()
 
     now_cn = datetime.now(TZ_CN)
-    logger.info(f"═══ AI 加密日报 生成开始 {now_cn.strftime('%Y-%m-%d %H:%M')} ═══")
+    logger.info(f"═══ AI 加密周报 生成开始 {now_cn.strftime('%Y-%m-%d %H:%M')} ═══")
 
     # ──────────────────────────────
     # Step 1: 加密货币技术分析
@@ -159,7 +159,7 @@ def run(print_report: bool = False, test_mode: bool = False):
     # ──────────────────────────────
     # Step 5: 风险分析 + 报告生成
     # ──────────────────────────────
-    logger.info("Step 5/5: 分析风险并生成报告...")
+    logger.info("Step 5/5: 分析风险并生成周报...")
     risk_analysis = analyze_risks(news, macro)
     logger.info(f"  风险等级: {risk_analysis['risk_level']} | 检测到 {len(risk_analysis['risks'])} 个风险点")
     logger.info(f"  川普信号: {risk_analysis['trump_signal']['label']}")
@@ -224,11 +224,11 @@ def _fmt_pct(pct: float) -> str:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="AI 加密日报生成器",
+        description="AI 加密周报生成器",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例:
-  python main.py              # 生成报告并保存
+  python main.py              # 生成周报并保存
   python main.py --print      # 生成并打印到控制台
   python main.py --test       # 测试模式（不保存文件）
   python main.py --verbose    # 详细日志

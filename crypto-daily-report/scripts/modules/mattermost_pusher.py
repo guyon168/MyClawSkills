@@ -1,6 +1,6 @@
 """
 Mattermost Incoming Webhook 推送模块
-使用 Mattermost 原生 Markdown 格式推送周报
+使用 Mattermost 原生 Markdown 格式推送日报
 支持长内容按 Markdown 结构自动分段推送，并对临时网络失败进行重试
 """
 import logging
@@ -20,7 +20,7 @@ DEFAULT_RETRY_TIMES = int(os.getenv("MATTERMOST_RETRY_TIMES", "3"))
 DEFAULT_RETRY_DELAY = float(os.getenv("MATTERMOST_RETRY_DELAY", "1.5"))
 # 分段推送间隔（秒），防止频率限制
 PUSH_INTERVAL = 0.5
-DEFAULT_USERNAME = "Crypto Weekly Bot"
+DEFAULT_USERNAME = "Crypto Daily Bot"
 
 
 def push_to_mattermost(
