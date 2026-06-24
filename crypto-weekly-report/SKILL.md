@@ -1,111 +1,64 @@
-# Crypto Weekly Report
+---
+name: crypto-weekly-workbuddy
+description: 使用项目内 Python 只抓取真实加密市场、新闻和宏观日历数据，并由当前 WorkBuddy 对话模型基于可审计 JSON 生成加密市场周度分析。
+agent_created: true
+---
 
-## 用途
+# Crypto Weekly WorkBuddy Skill
 
-这个 Skill 是公开脱敏版 AI 加密周报生成器。它复用已脱敏的公开行情、宏观数据、加密新闻与公开 X/Twitter 热点采集能力，生成偏「每周综合复盘」口径的 Markdown 市场报告、风险提示与多空策略参考。
+## 触发场景
 
-适用于：
+当用户提出以下意图时使用本 Skill：
 
-- 生成 BTC / ETH / BNB 等主流币的每周综合报告素材
-- 聚合公开行情、公开新闻与公开社媒热点，形成周度市场观察
-- 输出可保存到本地，也可按环境变量配置推送到企业微信或 Mattermost
+- “运行加密周报”
+- “生成周报”
+- “用 WorkBuddy LLM 生成周报”
+- “不要用外部 LLM”
+- “只抓取真实数据，由当前对话模型写周报”
+- “新闻和宏观日历必须真实抓取”
 
-> 风险提示：报告仅供研究与信息整理，不构成投资建议。
+## 工作流
 
-## 来源说明
+1. 在包含 `crypto_bot/main.py` 的项目根目录下运行数据导出脚本：
 
-未在本机检索到独立的历史周报 Skill 项目。本目录基于已脱敏的 `crypto-daily-report` 能力创建周报版包装：代码继续使用公开数据源和同一套分析模块，入口、文档、环境变量和输出文案调整为周报口径。它不会伪造不存在的私有数据源或内部推送配置。
+   ```bash
+   python .workbuddy/skills/crypto-weekly-workbuddy/scripts/export_weekly_data.py
+   ```
 
-## 脱敏声明
+   如将本 Skill 安装在其他目录，请保持脚本相对路径不变，或从任意位置直接传入脚本路径运行。脚本会在运行时向上查找包含 `crypto_bot/main.py` 的项目根目录。
 
-本目录是公开脱敏版本：
+2. 脚本只执行项目现有真实数据采集逻辑，不调用外部大模型。
+3. 读取导出的结构化数据文件：`crypto_bot/output/weekly_data_current.json`。
+4. 生成周报前必须检查数据中的：
+   - `source_status.news`：逐个新闻源的 `status/count/url/fetched_at/error`。
+   - `source_status.macro`：逐个宏观日历源的 `status/count/url/fetched_at/error`。
+   - `errors`：所有失败源或步骤错误。
+   - `calendar`：只允许使用真实抓取事件；如果为空，需要在周报中透明说明宏观日历源抓取失败或无可解析事件。
+5. 由当前 WorkBuddy 对话模型生成完整 Markdown 周报，必须包含 6 大板块：
+   - `### 一、本周行情回顾 + 结构判断`
+   - `### 二、本周热点复盘（3条主线）`
+   - `### 三、下周展望 + 宏观日历`
+   - `### 四、下周操作策略`
+   - `### 五、Twitter热议（情绪温度计）`
+   - `### 六、下周行动清单`
+6. 将生成的 Markdown 保存到项目根目录，可使用格式化周报文件名。
+7. 保存后运行验证脚本，确认 6 个章节标题均存在且每章标题后都有非空正文：
 
-- 不包含原项目 `.git`、日志、历史报告、缓存、WorkBuddy memory 或真实配置产物。
-- 不包含企业微信 Webhook、Mattermost Webhook、GitHub token、API key、私密 URL。
-- Webhook 推送默认关闭，必须显式通过环境变量启用并注入 URL。
-- 公开行情和新闻接口均为无需密钥的公开接口。
+   ```bash
+   python .workbuddy/skills/crypto-weekly-workbuddy/scripts/validate_report.py "weekly-report.md"
+   ```
 
-## 安装
+## 数据真实性要求
 
-```bash
-cd crypto-weekly-report
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+- 禁止模拟数据、编造数据或用示例数据替代真实抓取结果。
+- 新闻必须来自真实 RSS/API/网页抓取；中文源只有真实解析成功才纳入 `news`。
+- 宏观日历必须来自真实 RSS/API/网页抓取；禁止使用 FOMC/CPI/非农等规律推算作为 `calendar` 数据。
+- 如果宏观真实抓取失败，`calendar` 必须为空或只保留已明确标注 `source/url/fetched_at` 的真实抓取事件，并在 `errors` 或 `source_status.macro` 中记录失败原因。
+- 周报正文分析只能基于导出的结构化数据文件中的真实抓取数据。
+- 如果某个数据源为空或抓取失败，必须在对应板块透明说明，例如：新闻源为空、宏观日历源失败、KOL 推文为空、ETF 数据不可用等。
+- 不得在 Python 脚本中调用 WorkBuddy 模型或任何外部 LLM；Python 只负责真实数据导出和报告结构验证。
 
-## 使用
+## 输出文件
 
-```bash
-cd crypto-weekly-report/scripts
-python main.py --test      # 测试模式：生成并打印，不保存文件、不推送
-python main.py --print     # 生成周报，保存到 reports/ 并打印
-python main.py             # 生成周报并保存
-```
-
-## 环境变量配置
-
-默认无需任何密钥即可生成周报。可选环境变量如下：
-
-| 变量 | 默认值 | 说明 |
-| --- | --- | --- |
-| `CRYPTO_WEEKLY_USE_PROXY` | `false` | 是否启用本地代理 |
-| `CRYPTO_WEEKLY_PROXY_URL` | `http://127.0.0.1:7890` | 代理地址 |
-| `CRYPTO_WEEKLY_PUSH_ENABLED` | `false` | 是否启用推送 |
-| `CRYPTO_WEEKLY_PUSH_PROVIDER` | `mattermost` | `mattermost` 或 `wechat` |
-| `MATTERMOST_WEBHOOK_URL` | 空 | Mattermost Incoming Webhook URL |
-| `MATTERMOST_USERNAME` | `Crypto Weekly Bot` | Mattermost 显示名称 |
-| `WECOM_WEBHOOK_URL` | 空 | 企业微信机器人 Webhook URL |
-| `CRYPTO_WEEKLY_REPORTS_DIR` | `scripts/reports` | 报告输出目录 |
-| `CRYPTO_WEEKLY_LOGS_DIR` | `scripts/logs` | 日志输出目录 |
-| `CRYPTO_WEEKLY_SR_ZONES_ENABLED` | `true` | 是否展示增强支撑/压力区间 |
-
-示例：
-
-```bash
-export CRYPTO_WEEKLY_PUSH_ENABLED=true
-export CRYPTO_WEEKLY_PUSH_PROVIDER=mattermost
-export MATTERMOST_WEBHOOK_URL="https://mattermost.example.invalid/incoming-webhook-placeholder"
-python scripts/main.py
-```
-
-## 目录结构
-
-```text
-crypto-weekly-report/
-├── SKILL.md
-├── README.md
-├── requirements.txt
-├── .gitignore
-└── scripts/
-    ├── main.py
-    ├── config.py
-    └── modules/
-        ├── crypto_data.py
-        ├── macro_data.py
-        ├── mattermost_pusher.py
-        ├── news_fetcher.py
-        ├── report_renderer.py
-        ├── risk_analyzer.py
-        ├── support_resistance_zones.py
-        ├── twitter_hotspot.py
-        └── wechat_pusher.py
-```
-
-## 数据来源
-
-- OKX / Binance / CoinGecko：行情与 K 线公开接口
-- Alternative.me：恐贪指数公开接口
-- Yahoo Finance 非官方公开接口：黄金、原油、DXY 等宏观数据
-- NS3 RSS：加密新闻公开 feed
-- Nitter / FxTwitter：公开社媒内容抓取，失败时自动降级
-
-## 常见问题
-
-### 没有配置 Webhook 会失败吗？
-
-不会。脱敏版本默认 `CRYPTO_WEEKLY_PUSH_ENABLED=false`，未配置 Webhook 时不会推送。即使启用推送但未配置 URL，程序也只会记录警告并继续完成报告生成。
-
-### 是否会写入原项目？
-
-不会。本 Skill 是独立副本，输出目录默认在当前 `scripts/` 下，和原始内部项目互不影响。
+- Raw data JSON：`crypto_bot/output/weekly_data_current.json`
+- 最终周报：项目根目录下的 Markdown 文件
