@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Export real weekly crypto market data for WorkBuddy report generation.
+"""Export real weekly crypto market data for Claude report generation.
 
 This script intentionally does not call any external LLM provider. It collects
 real data step by step, tolerates partial source failures, and always writes a
-JSON payload for the current WorkBuddy conversation model to analyze.
+JSON payload for the current Claude conversation model to analyze.
 """
 
 from __future__ import annotations
@@ -258,7 +258,7 @@ def build_payload(
     errors: dict[str, Any],
     source_status: dict[str, Any],
 ) -> dict[str, Any]:
-    """Build the canonical JSON payload consumed by WorkBuddy."""
+    """Build the canonical JSON payload consumed by Claude."""
     payload: dict[str, Any] = {
         "meta": make_json_safe(meta),
         "price": make_json_safe(raw_data.get("price", {})),
